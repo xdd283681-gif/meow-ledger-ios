@@ -1,9 +1,9 @@
 /* Browser preview bridge: the actual WXML and Page controller are reused. */
 (async function () {
   'use strict';
-  const native = window.MeowNative;
+  const native = null;
   const L = window.MeowLedger, mount = document.getElementById('app');
-  const {wxml, source} = window.MeowBundle;
+  const {wxml, source} = window.MeowWebBundle;
   const template = new DOMParser().parseFromString('<root xmlns:wx="wx">'+wxml+'</root>', 'application/xml');
   if (template.querySelector('parsererror')) throw new Error('WXML 解析失败：'+template.querySelector('parsererror').textContent);
   for (const node of template.querySelectorAll('*')) {
@@ -40,7 +40,7 @@
     for(const attr of Array.from(node.attributes)){
       const name=attr.name,value=interpolate(attr.value,ctx);
       if(name.startsWith('wx:')||name.startsWith('bind')||name.startsWith('catch')||['mode','fields','start','end','adjust-position','scroll-y'].includes(name))continue;
-      if(name==='src'){el.setAttribute(name,new URL('../miniprogram'+value,document.baseURI).href);continue;}
+      if(name==='src'){el.setAttribute(name,new URL('assets/'+value.split('/').pop(),document.baseURI).href);continue;}
       if(name==='type'&&tag==='input'){el.type='text';if(value==='digit')el.inputMode='decimal';continue;}
       if(name==='value'&&tag==='input'){el.value=value;continue;}
       el.setAttribute(name,value);
@@ -78,7 +78,7 @@
   window.__meowExportResult=message=>toast(message);
   function dialog(options){
     const root=document.getElementById('dialog-root'),mask=document.createElement('div');mask.className='confirm-mask';const card=document.createElement('div');card.className='confirm-card';card.setAttribute('role','alertdialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-labelledby','confirm-title');
-    const image=document.createElement('img');image.src=new URL('../miniprogram/assets/paw.svg',document.baseURI).href;image.alt='';card.appendChild(image);
+    const image=document.createElement('img');image.src=new URL('assets/paw.svg',document.baseURI).href;image.alt='';card.appendChild(image);
     const title=document.createElement('div');title.id='confirm-title';title.className='confirm-title';title.textContent=options.title;card.appendChild(title);const message=document.createElement('div');message.className='confirm-message';message.textContent=options.content;card.appendChild(message);
     const actions=document.createElement('div');actions.className='confirm-actions';const previous=document.activeElement;
     function close(confirm){root.replaceChildren();previous?.focus({preventScroll:true});options.success?.({confirm,cancel:!confirm});}
@@ -92,7 +92,17 @@
     hideKeyboard:()=>{document.activeElement?.blur();native?.hideKeyboard();},
     showToast:o=>toast(o.title),showModal:dialog,pageScrollTo:o=>mount.querySelector('.app-shell')?.scrollTo({top:o.scrollTop,behavior:'smooth'}),env:{USER_DATA_PATH:'/virtual'},
     getFileSystemManager:()=>({writeFile:o=>{virtualFiles.set(o.filePath,o.data);o.success?.();}}),
-    shareFileMessage:o=>{if(native){native.exportCsv(o.fileName,String(virtualFiles.get(o.filePath)));virtualFiles.delete(o.filePath);return;}const blob=new Blob([virtualFiles.get(o.filePath)],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=o.fileName;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);o.success?.();toast('账单已导出，喵～');},
+    shareFileMessage:async o=>{
+      const contents=String(virtualFiles.get(o.filePath));virtualFiles.delete(o.filePath);
+      try{
+        const file=new File([contents],o.fileName,{type:'text/csv;charset=utf-8'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          await navigator.share({files:[file],title:'喵喵账本 · '+page.data.accountName});
+          o.success?.();return;
+        }
+        const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=o.fileName;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);o.success?.();toast('已开始下载账单');
+      }catch(error){if(error.name!=='AbortError'){o.fail?.({errMsg:error.message});}}
+    },
     setClipboardData:o=>navigator.clipboard.writeText(o.data).then(()=>o.success?.()).catch(()=>toast('请允许剪贴板访问'))
   };
   function Page(def){page=Object.assign({},def);page.data=JSON.parse(JSON.stringify(def.data));page.setData=function(patch){for(const [key,value]of Object.entries(patch)){const parts=key.split('.');let target=this.data;while(parts.length>1){target=target[parts.shift()];}target[parts[0]]=value;}schedule();};}

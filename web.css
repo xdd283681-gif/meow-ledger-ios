@@ -1,0 +1,33 @@
+html,body.web-app{width:100%;height:100%;min-height:0;margin:0;padding:0;display:block;overflow:hidden;background:#faf9f5}
+body.web-app::before{display:none}
+.web-app .app-stage{width:100%;height:100%;height:100dvh;min-height:0;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}
+.web-app .app-shell{min-height:0;height:100%;padding-bottom:100px}
+.web-app .status-space{display:none}
+.web-app .app-header::after{display:none}
+.web-app .app-header{height:56px}
+.web-app .bottom-nav{padding-bottom:12px;border-radius:0}
+.web-app .sheet{max-height:100%;overflow:auto;padding-bottom:16px}
+.web-app .main{max-width:640px;margin:0 auto}
+.web-app .modal-mask{position:absolute}
+.web-app input{font-size:16px}
+.web-app .category-scroll{max-height:155px}
+.account-switch{display:flex;gap:5px;margin:0 20px 14px;padding:5px;border-radius:16px;background:#eeeee5;border:1px solid #e5e6d9}
+.account-option{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;color:#888e7b;font-size:14px;font-weight:600}
+.account-option img{width:18px;height:18px;opacity:.55}
+.account-option.active{background:#f7db82;color:#4e573d;box-shadow:0 2px 5px #646c4010}
+.account-option.active img{opacity:1}
+.entry-account{display:flex;align-items:center;gap:6px;font-size:11px;color:#6b7855;margin:0 0 7px}
+.entry-account img{width:13px;height:13px;opacity:.65}
+@media(min-width:700px){.account-switch{max-width:600px;margin-left:auto;margin-right:auto}}
+.web-app{--app-height:100dvh}
+html,body.web-app{height:var(--app-height,100dvh)}
+body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
+.web-app .app-stage{height:100%;height:100%}
+.web-app .app-header{justify-content:space-between;max-width:640px;margin:0 auto}
+.web-app .bottom-nav{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.web-app .app-shell{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+.web-app .sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.install-button{min-height:44px;display:flex;align-items:center;gap:4px;color:#6f7d58;font-size:11px;padding:0 8px;border-radius:10px}
+.install-button img{width:12px;height:12px;opacity:.65}
+.install-button:active{background:#eef0e5}
+@media(max-height:520px){.web-app .sheet{padding-top:6px}.web-app .sheet-handle{display:none}.web-app .category-scroll{max-height:92px}.web-app .sheet-header{margin-bottom:2px}.web-app .amount-input{padding-top:2px;padding-bottom:2px}.web-app .form-row{padding-top:6px;padding-bottom:6px}.web-app .sheet-footnote{display:none}}

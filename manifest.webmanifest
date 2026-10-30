@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "喵喵账本",
+  "short_name": "喵喵账本",
+  "lang": "zh-CN",
+  "description": "个人消费与公账，分别记下生活里的每一笔。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf9f5",
+  "theme_color": "#faf9f5",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
