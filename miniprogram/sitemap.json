@@ -1,0 +1,9 @@
+{
+  "desc": "个人记账数据不参与搜索",
+  "rules": [
+    {
+      "action": "disallow",
+      "page": "*"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+ "name":"meow-ledger-ios","version":"1.0.4","private":true,
+ "scripts":{"prepare:ios":"node scripts/prepare-ios.cjs","test":"node --test tests/ledger.test.js tests/comprehensive.test.js","test:ios":"node tests/ios.cjs"},
+ "devDependencies":{"playwright":"1.62.1"}
+}

@@ -1,0 +1,13 @@
+node_modules/
+build/
+*.xcarchive/
+*.ipa
+xcuserdata/
+MeowLedger/Web/
+*.p12
+*.p8
+*.mobileprovision
+*.pem
+*.key
+.env
+__pycache__/

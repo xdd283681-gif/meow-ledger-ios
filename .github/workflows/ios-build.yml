@@ -1,0 +1,45 @@
+name: iOS cloud build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test and prepare offline resources
+        run: |
+          npm test
+          npm run prepare:ios
+          python3 scripts/check-project.py
+          python3 tests/signing_test.py
+      - name: Compile for iPhone without signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcodebuild -project MeowLedger.xcodeproj -scheme MeowLedger \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build \
+            2>&1 | tee build-xcode.log
+          mkdir -p build/artifacts
+          ditto -c -k --keepParent build/DerivedData/Build/Products/Release-iphoneos/MeowLedger.app build/artifacts/MeowLedger-unsigned-app.zip
+          printf 'This is an unsigned compile check, not an installable IPA. Run the signed workflow after configuring Apple signing.\n' > build/artifacts/READ-ME.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-compile-result
+          path: |
+            build/artifacts/
+            build-xcode.log
+          retention-days: 7

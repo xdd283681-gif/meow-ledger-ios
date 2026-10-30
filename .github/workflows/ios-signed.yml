@@ -1,0 +1,51 @@
+name: iOS signed IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      bundle_id:
+        description: Bundle ID matching your Apple provisioning profile
+        required: true
+        default: com.meowledger.ios
+      export_method:
+        description: Apple signing distribution method
+        required: true
+        type: choice
+        default: debugging
+        options: [debugging, release-testing, app-store-connect]
+
+permissions:
+  contents: read
+
+jobs:
+  signed-ipa:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      IOS_BUNDLE_ID: ${{ inputs.bundle_id }}
+      IOS_EXPORT_METHOD: ${{ inputs.export_method }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test and prepare offline resources
+        run: |
+          npm test
+          npm run prepare:ios
+          python3 scripts/check-project.py
+          python3 tests/signing_test.py
+      - name: Install Apple signing and export IPA
+        shell: bash
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+        run: bash scripts/cloud-sign-ios.sh
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: MeowLedger-signed-IPA
+          path: build/export/*.ipa
+          if-no-files-found: error
+          retention-days: 7
