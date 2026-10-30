@@ -1,6 +1,6 @@
 # Windows 用户的苹果云编译流程
 
-本工程已配置两个 GitHub Actions 工作流。当前尚未创建远程仓库、运行云编译或生成签名 IPA。
+本工程已配置两个 GitHub Actions 工作流。远程仓库为 https://github.com/xdd283681-gif/meow-ledger-ios 。首次云编译已成功（运行编号 41001068352），已生成程序并打包未签名 IPA；尚未配置苹果签名或完成真机安装。
 
 ## 首次云编译
 
@@ -8,7 +8,7 @@
 
 提交后 `iOS cloud build` 会在 GitHub 的 macOS 15 运行器上执行记账测试、生成离线资源并编译真正的 iPhone 目标。它不需要苹果签名。完成后在 Actions → 本次运行 → Artifacts 下载编译结果。
 
-`MeowLedger-unsigned-app.zip` 仅供检查编译结果，不能直接安装到 iPhone。无签名编译成功后仍需配置苹果签名以生成可安装 IPA。
+`MeowLedger-unsigned-app.zip` 是已编译的 iPhone 程序。工作流也会打包 `meow-ledger-1.0.4-unsigned.ipa`，该 IPA 尚未签名；可由用户在 Windows 上使用 Sideloadly 等工具及自己的 Apple 账号完成个人签名与安装，或使用下方配置好的签名工作流。免费个人签名通常需要每 7 天续签，详见 https://sideloadly.io/faq 。
 
 ## 签名 IPA
 

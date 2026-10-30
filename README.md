@@ -2,9 +2,9 @@
 
 独立 iOS 版本 1.0.4，最低 iOS / iPadOS 15.0。保留猫咪界面、无示例数据、个人消费与公账、独立统计与预算、日期默认当天、CSV 导出。两类账本只在本机保存，不支持多人共享，与 Android、小程序的数据各自独立。
 
-没有 Mac 可以使用工程内附的 GitHub Actions 云编译，流程见 [CLOUD-BUILD.md](CLOUD-BUILD.md)。配置已准备，本轮尚未创建远程仓库或实际执行云编译。
+没有 Mac 可以使用工程内附的 GitHub Actions 云编译，流程见 [CLOUD-BUILD.md](CLOUD-BUILD.md)。工程已上传到 https://github.com/xdd283681-gif/meow-ledger-ios ，云编译结果以 GitHub Actions 记录为准。
 
-此文件夹是完整的 Xcode 源码工程，**目前没有已编译、签名或真机验证的 IPA**。当前工作电脑是 Windows，没有 Xcode 和苹果签名环境。解压源代码 ZIP 不能直接安装到 iPhone。
+此文件夹是完整的 Xcode 源码工程。已于 2026-10-30 通过 GitHub 云端 Mac 上的 Xcode 16.4 编译，得到真正的 iPhone 程序，并打包了未签名 IPA。IPA 仍需个人签名后安装，尚未 iPhone 真机验证。源代码 ZIP 不能直接安装到 iPhone。
 
 ## 在 Mac 上安装到自己的 iPhone
 

@@ -34,7 +34,8 @@ jobs:
             2>&1 | tee build-xcode.log
           mkdir -p build/artifacts
           ditto -c -k --keepParent build/DerivedData/Build/Products/Release-iphoneos/MeowLedger.app build/artifacts/MeowLedger-unsigned-app.zip
-          printf 'This is an unsigned compile check, not an installable IPA. Run the signed workflow after configuring Apple signing.\n' > build/artifacts/READ-ME.txt
+          python3 scripts/package-unsigned-ipa.py build/artifacts/MeowLedger-unsigned-app.zip build/artifacts/meow-ledger-1.0.4-unsigned.ipa
+          printf 'This IPA is UNSIGNED. Sign it with your Apple account before installing. Alternatively configure the signed workflow.\n' > build/artifacts/READ-ME.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
