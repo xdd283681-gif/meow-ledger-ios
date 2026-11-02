@@ -43,6 +43,7 @@
       if(name==='src'){el.setAttribute(name,new URL('assets/'+value.split('/').pop(),document.baseURI).href);continue;}
       if(name==='type'&&tag==='input'){el.type='text';if(value==='digit')el.inputMode='decimal';continue;}
       if(name==='value'&&tag==='input'){el.value=value;continue;}
+      if(name==='disabled'){el.disabled=value==='true';continue;}
       el.setAttribute(name,value);
     }
     if(tag==='image')el.alt='';
@@ -69,9 +70,9 @@
     const newEditor=!!sheet;if(newEditor)shell.style.overflow='hidden';
     const next=key?Array.from(mount.querySelectorAll('[data-render-key]')).find(el=>el.dataset.renderKey===key):null;
     if(next){next.focus({preventScroll:true});try{next.setSelectionRange(selection,end);}catch(_){}}
-    if(!oldEditor&&newEditor){focusReturn=active;sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label',page.data.budgetEditor?'月度预算':'记一笔');}
+    if(!oldEditor&&newEditor){focusReturn=active;sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label',page.data.exportEditor?'导出公账报销单':page.data.budgetEditor?'月度预算':'记一笔');}
     if(oldEditor&&!newEditor){mount.querySelector('.nav-add')?.focus({preventScroll:true});}
-    if(sheet){sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label',page.data.budgetEditor?'月度预算':'记一笔');}
+    if(sheet){sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label',page.data.exportEditor?'导出公账报销单':page.data.budgetEditor?'月度预算':'记一笔');}
   }
   function schedule(){if(!scheduled){scheduled=true;queueMicrotask(render);}}
   function toast(title){const el=document.getElementById('toast');clearTimeout(toastTimer);el.textContent=title;el.classList.add('visible');toastTimer=setTimeout(()=>el.classList.remove('visible'),2400);}
@@ -93,9 +94,9 @@
     showToast:o=>toast(o.title),showModal:dialog,pageScrollTo:o=>mount.querySelector('.app-shell')?.scrollTo({top:o.scrollTop,behavior:'smooth'}),env:{USER_DATA_PATH:'/virtual'},
     getFileSystemManager:()=>({writeFile:o=>{virtualFiles.set(o.filePath,o.data);o.success?.();}}),
     shareFileMessage:async o=>{
-      const contents=String(virtualFiles.get(o.filePath));virtualFiles.delete(o.filePath);
+      const contents=virtualFiles.get(o.filePath);virtualFiles.delete(o.filePath);
       try{
-        const file=new File([contents],o.fileName,{type:'text/csv;charset=utf-8'});
+        const file=new File([contents],o.fileName,{type:o.mimeType||'text/csv;charset=utf-8'});
         if(navigator.canShare&&navigator.canShare({files:[file]})){
           await navigator.share({files:[file],title:'喵喵账本 · '+page.data.accountName});
           o.success?.();return;
@@ -108,7 +109,7 @@
   function Page(def){page=Object.assign({},def);page.data=JSON.parse(JSON.stringify(def.data));page.setData=function(patch){for(const [key,value]of Object.entries(patch)){const parts=key.split('.');let target=this.data;while(parts.length>1){target=target[parts.shift()];}target[parts[0]]=value;}schedule();};}
   new Function('require','Page','wx',source)(()=>L,Page,wx);
   page.onLoad();render();window.__meowPage=page;
-  window.__meowBack=()=>{const buttons=document.querySelectorAll('.confirm-actions button');if(buttons.length){buttons[0].click();return true;}if(page.data.editor||page.data.budgetEditor){page.closeEditor();return true;}if(page.data.tab!=='home'){page.switchTab({currentTarget:{dataset:{tab:'home'}}});return true;}return false;};
+  window.__meowBack=()=>{const buttons=document.querySelectorAll('.confirm-actions button');if(buttons.length){buttons[0].click();return true;}if(page.data.editor||page.data.budgetEditor||page.data.exportEditor){page.closeEditor();return true;}if(page.data.tab!=='home'){page.switchTab({currentTarget:{dataset:{tab:'home'}}});return true;}return false;};
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){const cancel=document.querySelector('.confirm-actions button:not(.confirm-primary)');if(cancel){cancel.click();return;}if(!document.querySelector('.confirm-mask'))page.closeEditor();}
     if(e.key==='Tab'){const dialog=document.querySelector('.confirm-card')||mount.querySelector('.sheet');if(dialog){const els=Array.from(dialog.querySelectorAll('button,input,[tabindex="0"]')).filter(el=>el.offsetParent!==null),first=els[0],last=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}}

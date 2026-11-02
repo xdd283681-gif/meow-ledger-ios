@@ -30,4 +30,20 @@ body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
 .install-button{min-height:44px;display:flex;align-items:center;gap:4px;color:#6f7d58;font-size:11px;padding:0 8px;border-radius:10px}
 .install-button img{width:12px;height:12px;opacity:.65}
 .install-button:active{background:#eef0e5}
+.report-fields{padding:0 2px 8px}
+.report-field-label{font-size:12px;color:#65744d;margin:10px 0 6px}
+.report-options{display:flex;gap:6px}
+.report-options button{flex:1;border:1px solid #e2e4d7;background:#f4f4ed;color:#747c66;border-radius:10px;min-height:42px;font:inherit;font-size:12px;padding:6px 3px}
+.report-options button.active{background:#f7db82;color:#4e573d;border-color:#e8cb6f;font-weight:600}
+.report-hint{font-size:12px;color:#65744d;margin-top:10px;line-height:1.7}
+.report-hint span{display:block;color:#929782;font-size:11px}
+.export-help{font-size:12px;color:#7c846f;line-height:1.8;margin:10px 0}
+.export-year{display:flex;align-items:center;justify-content:center;gap:24px;margin:18px 0;color:#4e573d;font-weight:600}
+.export-year button{border:1px solid #e2e4d7;border-radius:12px;background:#f4f4ed;color:#65744d;width:44px;height:44px;font-size:22px}
+.export-summary{padding:4px 16px;background:#f1f3e8;border-radius:14px}
+.export-summary>div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 0;font-size:13px;color:#65744d}
+.export-download{margin-top:12px}
+.export-download:disabled{opacity:.5;cursor:wait}
+.secondary-export{background:#e6eddf;color:#566643}
+.csv-export{display:block;background:none;border:0;color:#7e886d;text-decoration:underline;font-size:12px;padding:18px 0;min-height:44px;width:100%}
 @media(max-height:520px){.web-app .sheet{padding-top:6px}.web-app .sheet-handle{display:none}.web-app .category-scroll{max-height:92px}.web-app .sheet-header{margin-bottom:2px}.web-app .amount-input{padding-top:2px;padding-bottom:2px}.web-app .form-row{padding-top:6px;padding-bottom:6px}.web-app .sheet-footnote{display:none}}

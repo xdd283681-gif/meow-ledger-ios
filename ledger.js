@@ -34,6 +34,22 @@
   function category(id) { return categories.find(function (c) { return c.id === id; }) || categories[8]; }
   function empty() { return { version: 1, budget: 0, isDemo: false, transactions: [] }; }
   var accountNames = { personal: '个人消费', public: '公账' };
+  var reportGroupNames = { general: '普通采购', drinks: '酒水' };
+  var reportColumnNames = { food: '食材', supplies: '耗材', other: '其他' };
+  function reportClass(row) {
+    var text = String(row.note || '').toLowerCase();
+    // Check utensils, cooking ingredients and mixed meals before beverage names.
+    var notDrink = /酒杯|饮料杯|梅酒杯|水杯|杯子|纸杯|玻璃杯|酒具|开瓶器|冰桶|酒精|料酒|味醂|米酒醋|酒酿|啤酒鸭|红酒炖|聚餐|餐费|加餐|团建/.test(text);
+    var isDrink = !notDrink && (/獭祭|獺祭|清酒|烧酒|燒酒|啤酒|白酒|红酒|紅酒|葡萄酒|梅酒|威士忌|伏特加|香槟|白兰地|朗姆|金酒|龙舌兰酒|酒水|日本酒|黄酒|果酒|饮料|飲料|果汁|汽水|苏打水|气泡水|矿泉水|纯净水|可乐|雪碧|椰汁|椰奶|乌龙茶|绿茶|红茶|咖啡|奶茶|sake|whisky|whiskey|vodka|beer|wine/.test(text) || row.category === 'coffee');
+    var group = Object.prototype.hasOwnProperty.call(reportGroupNames, row.reportGroup) ? row.reportGroup : isDrink ? 'drinks' : 'general';
+    var column;
+    if (/玫瑰花|鲜花|花束|纸巾|餐巾|保鲜膜|保鲜袋|垃圾袋|一次性|手套|口罩|清洁|洗洁|消毒|抹布|百洁布|海绵/.test(text)) column = 'supplies';
+    else if (/杯|跑腿|配送|运费|交通|车费|打车|保济丸|药|烤垫|疏通剂|电子秤|水晶砂|餐具|锅|盘子|碗|刀具|开瓶器|冰桶|酒具|办公|维修|电费|租金|聚餐|团建/.test(text)) column = 'other';
+    else if (group === 'drinks' || /无花果|饼干|柠檬|牛油果|虾|南瓜|玉米|包菜|鸡蛋|无菌蛋|火腿|大葱|花椒油|番茄|沙拉汁|辣椒|食材|蔬菜|水果|牛肉|猪肉|鸡肉|海鲜|大米|面粉|酱油|食用油|加餐/.test(text) || ['food', 'coffee'].includes(row.category)) column = 'food';
+    else column = 'other';
+    if (Object.prototype.hasOwnProperty.call(reportColumnNames, row.reportColumn)) column = row.reportColumn;
+    return { group: group, column: column, groupName: reportGroupNames[group], columnName: reportColumnNames[column] };
+  }
   function emptyWorkspace() { return { version: 2, activeAccount: 'personal', accounts: { personal: empty(), public: empty() } }; }
   function normalizeWorkspace(value) {
     if (!value) return emptyWorkspace();
@@ -55,7 +71,11 @@
     var rows = value.transactions.map(function (r) {
       if (!r || typeof r.id !== 'string' || !r.id || ids[r.id] || !['income', 'expense'].includes(r.type) || !Number.isSafeInteger(r.amount) || r.amount <= 0 || r.amount > 999999999 || !validDate(r.date) || !categories.some(function (c) { return c.id === r.category && c.type === r.type; })) throw new Error('账本中包含无效记录');
       ids[r.id] = true;
-      return { id: r.id, type: r.type, category: r.category, amount: r.amount, date: r.date, note: String(r.note || '').slice(0, 40), createdAt: Number(r.createdAt) || 0 };
+      var row = { id: r.id, type: r.type, category: r.category, amount: r.amount, date: r.date, note: String(r.note || '').slice(0, 40), createdAt: Number(r.createdAt) || 0 };
+      if (r.spec) row.spec = String(r.spec).trim().slice(0, 80);
+      if (Object.prototype.hasOwnProperty.call(reportGroupNames, r.reportGroup)) row.reportGroup = r.reportGroup;
+      if (Object.prototype.hasOwnProperty.call(reportColumnNames, r.reportColumn)) row.reportColumn = r.reportColumn;
+      return row;
     });
     if (!Number.isSafeInteger(value.budget) || value.budget < 0 || value.budget > 999999999) throw new Error('预算金额无效');
     return { version: 1, budget: value.budget, isDemo: !!value.isDemo, transactions: rows };
@@ -68,6 +88,9 @@
     var id = input.id || 'tx-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
     if (input.id && !state.transactions.some(function (t) { return t.id === input.id; })) throw new Error('这笔记录已不存在');
     var row = { id: id, type: input.type, category: c.id, amount: amount, date: input.date, note: String(input.note || '').trim().slice(0, 40), createdAt: Date.now() };
+    if (input.spec) row.spec = input.spec;
+    if (input.reportGroup) row.reportGroup = input.reportGroup;
+    if (input.reportColumn) row.reportColumn = input.reportColumn;
     var rows = state.transactions.filter(function (t) { return t.id !== id; });
     rows.push(row);
     return normalize(Object.assign({}, state, { transactions: rows }));
@@ -101,7 +124,8 @@
   }
   function csv(state, accountName) {
     var cell = function(s) { var v=String(s); if (/^[=+\-@\t\r]/.test(v)) v="'"+v; return '"'+v.replace(/"/g,'""')+'"'; };
-    return '\ufeff' + (accountName ? '账本,' : '') + '日期,类型,分类,金额,备注\r\n' + state.transactions.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(r){var values=[r.date,r.type==='expense'?'支出':'收入',category(r.category).name,(r.amount/100).toFixed(2),r.note];if(accountName)values.unshift(accountName);return values.map(cell).join(',');}).join('\r\n');
+    var isPublic = accountName === accountNames.public;
+    return '\ufeff' + (accountName ? '账本,' : '') + '日期,类型,分类,金额,备注' + (isPublic ? ',规格,报销单,金额列' : '') + '\r\n' + state.transactions.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(r){var values=[r.date,r.type==='expense'?'支出':'收入',category(r.category).name,(r.amount/100).toFixed(2),r.note];if(accountName)values.unshift(accountName);if(isPublic){var kind=reportClass(r);values.push(r.spec||'',r.type==='expense'?kind.groupName:'',r.type==='expense'?kind.columnName:'');}return values.map(cell).join(',');}).join('\r\n');
   }
-  return { KEY:KEY,accountNames:accountNames,emptyWorkspace:emptyWorkspace,normalizeWorkspace:normalizeWorkspace,categories:categories,today:today,money:money,parseAmount:parseAmount,validDate:validDate,category:category,empty:empty,normalize:normalize,saveEntry:saveEntry,summary:summary,shiftMonth:shiftMonth,csv:csv };
+  return { KEY:KEY,accountNames:accountNames,reportClass:reportClass,reportGroupNames:reportGroupNames,reportColumnNames:reportColumnNames,emptyWorkspace:emptyWorkspace,normalizeWorkspace:normalizeWorkspace,categories:categories,today:today,money:money,parseAmount:parseAmount,validDate:validDate,category:category,empty:empty,normalize:normalize,saveEntry:saveEntry,summary:summary,shiftMonth:shiftMonth,csv:csv };
 });
