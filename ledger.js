@@ -35,15 +35,17 @@
   function empty() { return { version: 1, budget: 0, isDemo: false, transactions: [] }; }
   var accountNames = { personal: '个人消费', public: '公账' };
   var reportGroupNames = { general: '普通采购', drinks: '酒水' };
-  var reportColumnNames = { food: '食材', supplies: '耗材', other: '其他' };
+  var reportColumnNames = { food: '食材', supplies: '耗材', other: '其他', parttime: '兼职' };
   function reportClass(row) {
     var text = String(row.note || '').toLowerCase();
     // Check utensils, cooking ingredients and mixed meals before beverage names.
-    var notDrink = /酒杯|饮料杯|梅酒杯|水杯|杯子|纸杯|玻璃杯|酒具|开瓶器|冰桶|酒精|料酒|味醂|米酒醋|酒酿|啤酒鸭|红酒炖|聚餐|餐费|加餐|团建/.test(text);
+    var isParttime = /兼职|兼職|临时工|臨時工|小时工|小時工|钟点工|鐘點工/.test(text);
+    var notDrink = isParttime || /酒杯|饮料杯|梅酒杯|水杯|杯子|纸杯|玻璃杯|酒具|开瓶器|冰桶|酒精|料酒|味醂|米酒醋|酒酿|啤酒鸭|红酒炖|聚餐|餐费|加餐|团建/.test(text);
     var isDrink = !notDrink && (/獭祭|獺祭|清酒|烧酒|燒酒|啤酒|白酒|红酒|紅酒|葡萄酒|梅酒|威士忌|伏特加|香槟|白兰地|朗姆|金酒|龙舌兰酒|酒水|日本酒|黄酒|果酒|饮料|飲料|果汁|汽水|苏打水|气泡水|矿泉水|纯净水|可乐|雪碧|椰汁|椰奶|乌龙茶|绿茶|红茶|咖啡|奶茶|sake|whisky|whiskey|vodka|beer|wine/.test(text) || row.category === 'coffee');
-    var group = Object.prototype.hasOwnProperty.call(reportGroupNames, row.reportGroup) ? row.reportGroup : isDrink ? 'drinks' : 'general';
+    var group = row.reportColumn === 'parttime' ? 'general' : Object.prototype.hasOwnProperty.call(reportGroupNames, row.reportGroup) ? row.reportGroup : isDrink ? 'drinks' : 'general';
     var column;
-    if (/玫瑰花|鲜花|花束|纸巾|餐巾|保鲜膜|保鲜袋|垃圾袋|一次性|手套|口罩|清洁|洗洁|消毒|抹布|百洁布|海绵/.test(text)) column = 'supplies';
+    if (group === 'general' && isParttime) column = 'parttime';
+    else if (/玫瑰花|鲜花|花束|纸巾|餐巾|保鲜膜|保鲜袋|垃圾袋|一次性|手套|口罩|清洁|洗洁|消毒|抹布|百洁布|海绵/.test(text)) column = 'supplies';
     else if (/杯|跑腿|配送|运费|交通|车费|打车|保济丸|药|烤垫|疏通剂|电子秤|水晶砂|餐具|锅|盘子|碗|刀具|开瓶器|冰桶|酒具|办公|维修|电费|租金|聚餐|团建/.test(text)) column = 'other';
     else if (group === 'drinks' || /无花果|饼干|柠檬|牛油果|虾|南瓜|玉米|包菜|鸡蛋|无菌蛋|火腿|大葱|花椒油|番茄|沙拉汁|辣椒|食材|蔬菜|水果|牛肉|猪肉|鸡肉|海鲜|大米|面粉|酱油|食用油|加餐/.test(text) || ['food', 'coffee'].includes(row.category)) column = 'food';
     else column = 'other';
