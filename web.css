@@ -33,10 +33,8 @@ body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
 .report-fields{padding:0 2px 8px}
 .report-field-label{font-size:12px;color:#65744d;margin:10px 0 6px}
 .report-options{display:flex;gap:6px}
-.report-options button{flex:1;border:1px solid #e2e4d7;background:#f4f4ed;color:#747c66;border-radius:10px;min-height:42px;font:inherit;font-size:12px;padding:6px 3px}
+.report-options button{flex:1;min-width:0;border:1px solid #e2e4d7;background:#f4f4ed;color:#747c66;border-radius:10px;min-height:44px;font:inherit;font-size:12px;padding:6px 3px}
 .report-options button.active{background:#f7db82;color:#4e573d;border-color:#e8cb6f;font-weight:600}
-.report-hint{font-size:12px;color:#65744d;margin-top:10px;line-height:1.7}
-.report-hint span{display:block;color:#929782;font-size:11px}
 .export-help{font-size:12px;color:#7c846f;line-height:1.8;margin:10px 0}
 .export-year{display:flex;align-items:center;justify-content:center;gap:24px;margin:18px 0;color:#4e573d;font-weight:600}
 .export-year button{border:1px solid #e2e4d7;border-radius:12px;background:#f4f4ed;color:#65744d;width:44px;height:44px;font-size:22px}
@@ -46,9 +44,6 @@ body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
 .export-download:disabled{opacity:.5;cursor:wait}
 .secondary-export{background:#e6eddf;color:#566643}
 .csv-export{display:block;background:none;border:0;color:#7e886d;text-decoration:underline;font-size:12px;padding:18px 0;min-height:44px;width:100%}
-.report-compact{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;border:0;background:transparent;text-align:left;color:#6b7759;padding:8px 0;font:inherit}
-.report-compact view{display:flex;align-items:center;gap:12px}.report-compact b{color:#46533b;font-size:14px}.report-compact>span{font-size:12px;color:#738263}.report-expanded{padding-bottom:8px}
-.report-compact .report-hint{margin:0;padding:0;background:transparent}
 @media(max-height:520px){.web-app .sheet{padding-top:6px}.web-app .sheet-handle{display:none}.web-app .category-scroll{max-height:92px}.web-app .sheet-header{margin-bottom:2px}.web-app .amount-input{padding-top:2px;padding-bottom:2px}.web-app .form-row{padding-top:6px;padding-bottom:6px}.web-app .sheet-footnote{display:none}}
 
 /* Public ledger: an explicit reimbursement workspace instead of a generic expense form. */
@@ -163,51 +158,10 @@ body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
 .public-entry-steps>i{height:1px;flex:1;background:#e0e2d7}
 .public-entry-fields{margin-top:1px}
 .public-note-row{border-top:1px solid #e3e4d6}
-.public-report-fields{margin-top:15px;padding:14px 12px 12px;border:1px solid #dfe3d5;border-radius:15px;background:#f5f6ef}
-.report-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:10px}
-.report-section-heading>div:first-child>span{display:block;font-size:13px;font-weight:650;color:#536044}
-.report-section-heading small{display:block;font-size:8.5px;color:#969d8a;margin-top:4px}
-.report-auto-badge{flex:none;max-width:45%;padding:6px 8px;border-radius:8px;background:#fff9e3;border:1px solid #ecdfae;color:#7f7041;font-size:8.5px;font-weight:600;text-align:right}
-.report-auto-toggle{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #dfe3d5;border-radius:10px;background:#fff;text-align:left;color:#657153}
-.report-auto-toggle.active{border-color:#d4bb62;background:#fff9e7}
-.report-auto-toggle>div:first-child text,.report-auto-toggle>div:first-child small{display:block}
-.report-auto-toggle>div:first-child text{font-size:10.5px;font-weight:650}
-.report-auto-toggle>div:first-child small{font-size:8.5px;color:#949b89;margin-top:3px}
-.auto-switch{width:34px;height:20px;padding:2px;border-radius:20px;background:#dfe2d7;flex-shrink:0;transition:background .2s}
-.auto-switch i{display:block;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #4f573d2b;transition:transform .2s}
-.report-auto-toggle.active .auto-switch{background:#d8b84d}
-.report-auto-toggle.active .auto-switch i{transform:translateX(14px)}
-.report-group-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
-.report-group-card{position:relative;min-height:87px;padding:10px 9px;border:1px solid #dfe2d7;border-radius:11px;background:#fff;text-align:left;color:#657153;display:flex;align-items:flex-start;gap:7px}
-.report-group-card.active{border-color:#c7ac4f;box-shadow:0 0 0 1px #c7ac4f inset;background:#fff8df}
-.report-group-card.drinks.active{border-color:#87a36e;box-shadow:0 0 0 1px #87a36e inset;background:#f1f6eb}
-.report-group-card>img{width:22px;height:22px;opacity:.7;margin-top:1px}
-.report-group-card>div{min-width:0;flex:1}
-.report-group-card text,.report-group-card small{display:block}
-.report-group-card text{font-size:11px;font-weight:650}
-.report-group-card small{font-size:8px;color:#959c8b;line-height:1.45;margin-top:4px}
-.report-group-card>b{position:absolute;right:7px;bottom:7px;font-size:7.5px;font-weight:500;color:#a19c7e}
-.report-column-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:14px 0 7px}
-.report-column-heading>text{font-size:10.5px;font-weight:650;color:#65744d}
-.report-column-heading>small{font-size:8px;color:#9ba190}
-.report-column-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.report-column-grid button{position:relative;min-height:62px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:8px 8px 8px 32px;border:1px solid #dfe2d7;border-radius:9px;background:#fff;color:#6d775f;text-align:left}
-.report-column-grid button img{position:absolute;left:9px;top:10px;width:16px;height:16px;opacity:.52}
-.report-column-grid button text{font-size:10px;font-weight:650}
-.report-column-grid button small{font-size:7.5px;color:#9aa08f;margin-top:3px}
-.report-column-grid button.active{border-color:#d3b75d;background:#fff9e8;box-shadow:0 0 0 1px #d3b75d inset;color:#5b633f}
-.report-column-grid button.parttime{border-style:dashed}
-.report-column-grid button.parttime.active{border-style:solid;border-color:#c98c78;background:#fff4ef;box-shadow:0 0 0 1px #c98c78 inset;color:#7c574d}
-.report-spec-row{margin-top:7px;border-top:1px solid #e2e5d9}
-.public-report-fields .report-hint{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:10px;padding:9px 10px;border-radius:9px;background:#e9eee1;color:#526142;font-size:10px}
-.public-report-fields .report-hint>text{color:#8e9680;font-size:8.5px}
-.public-report-fields .report-hint>b{font-size:10px}
-.public-report-fields .report-hint>small{display:block;width:100%;color:#8d9582;font-size:8.5px;line-height:1.5}
-.public-income-note{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border:1px solid #dfe4d8;border-radius:11px;background:#f1f4ea;color:#657153}
-.public-income-note img{width:18px;height:18px;opacity:.58;margin-top:1px}
-.public-income-note text,.public-income-note small{display:block}
-.public-income-note text{font-size:10.5px;font-weight:650}
-.public-income-note small{font-size:8.5px;color:#929989;line-height:1.5;margin-top:4px}
+.sheet-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;min-width:0;padding-right:8px}
+.sheet-title .report-hint{display:inline-flex;align-items:center;white-space:nowrap;padding:4px 7px;border-radius:6px;background:#fff1c8;color:#766126;font-size:11px;font-weight:500;line-height:1.5}
+.sheet-title .report-hint.drinks{background:#e7efdf;color:#5e754b}
+.report-spec-row{border-top:1px solid #e2e5d9}
 @media(max-width:365px){
   .public-hero-card{padding-left:13px;padding-right:13px}
   .public-hero-halves>div{padding-left:7px;padding-right:7px}
@@ -226,8 +180,4 @@ body.web-app{padding-top:env(safe-area-inset-top);box-sizing:border-box}
   .bill-tools{align-items:stretch}
   .batch-toggle{max-width:72px;padding:0 6px}
   .batch-bar button{padding:0 8px}
-  .report-auto-badge{display:none}
-  .report-group-card{padding-left:7px;padding-right:7px}
-  .report-group-card>img{display:none}
-  .report-column-heading>small{display:none}
 }
