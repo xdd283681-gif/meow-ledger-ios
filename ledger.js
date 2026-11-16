@@ -103,7 +103,11 @@
     var all = state.transactions.filter(function (r) { return r.date.slice(0, 7) === month; });
     var expense = 0, income = 0;
     all.forEach(function (r) { if (r.type === 'expense') expense += r.amount; else income += r.amount; });
-    var selected = all.filter(function (r) { return (!filter || filter === 'all' || r.type === filter) && (!query || (r.note + category(r.category).name).toLowerCase().includes(query.toLowerCase())); }).sort(function (a, b) { return b.date.localeCompare(a.date) || b.createdAt - a.createdAt; });
+    var selected = all.filter(function (r) {
+      var matchesFilter = !filter || filter === 'all' || r.type === filter ||
+        ((filter === 'general' || filter === 'drinks') && r.type === 'expense' && reportClass(r).group === filter);
+      return matchesFilter && (!query || (r.note + category(r.category).name).toLowerCase().includes(query.toLowerCase()));
+    }).sort(function (a, b) { return b.date.localeCompare(a.date) || b.createdAt - a.createdAt; });
     var groups = [];
     selected.forEach(function (r) {
       var g = groups.find(function (g) { return g.date === r.date; });
