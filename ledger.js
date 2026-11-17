@@ -52,6 +52,30 @@
     if (Object.prototype.hasOwnProperty.call(reportColumnNames, row.reportColumn)) column = row.reportColumn;
     return { group: group, column: column, groupName: reportGroupNames[group], columnName: reportColumnNames[column] };
   }
+  function reportStatistics(state, month) {
+    var rows = state.transactions.filter(function (row) { return row.type === 'expense' && row.date.slice(0, 7) === month; });
+    var total = rows.reduce(function (sum, row) { return sum + row.amount; }, 0);
+    function bucket() { return { count: 0, amount: 0, amountText: '0.00', share: 0, shareText: '0%' }; }
+    var summary = { general: bucket(), drinks: bucket(), firstHalf: bucket(), secondHalf: bucket(), columns: {}, total: total, totalText: money(total), count: rows.length, averageText: money(rows.length ? Math.round(total / rows.length) : 0) };
+    Object.keys(reportColumnNames).forEach(function (key) { summary.columns[key] = bucket(); });
+    var daysInMonth = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0).getDate();
+    summary.days = Array.from({ length: daysInMonth }, function (_, i) { return { date: month + '-' + pad(i + 1), day: i + 1, amount: 0, count: 0 }; });
+    rows.forEach(function (row) {
+      var kind = reportClass(row), day = Number(row.date.slice(8));
+      [summary[kind.group], summary.columns[kind.column], summary[day <= 15 ? 'firstHalf' : 'secondHalf'], summary.days[day - 1]].forEach(function (item) { item.amount += row.amount; item.count++; });
+    });
+    [summary.general, summary.drinks, summary.firstHalf, summary.secondHalf].concat(Object.values(summary.columns)).forEach(function (item) {
+      item.amountText = money(item.amount); item.share = total ? item.amount / total * 100 : 0;
+      item.shareText = item.amount && item.share < 0.1 ? '<0.1%' : Number(item.share.toFixed(1)) + '%';
+    });
+    var peak = Math.max.apply(null, summary.days.map(function (d) { return d.amount; }));
+    summary.days.forEach(function (d) { d.amountText = money(d.amount); d.height = peak ? d.amount / peak * 100 : 0; });
+    summary.activeDays = summary.days.filter(function (d) { return d.count; });
+    summary.peakText = peak ? summary.days.find(function (d) { return d.amount === peak; }).day + '日 · ¥ ' + money(peak) : '暂无支出';
+    summary.axisMax = money(peak); summary.lastDay = daysInMonth;
+    summary.columnRows = Object.keys(reportColumnNames).map(function (key) { return Object.assign({ id: key, name: reportColumnNames[key] }, summary.columns[key]); });
+    return summary;
+  }
   function emptyWorkspace() { return { version: 2, activeAccount: 'personal', accounts: { personal: empty(), public: empty() } }; }
   function normalizeWorkspace(value) {
     if (!value) return emptyWorkspace();
@@ -133,5 +157,5 @@
     var isPublic = accountName === accountNames.public;
     return '\ufeff' + (accountName ? '账本,' : '') + '日期,类型,分类,金额,备注' + (isPublic ? ',规格,报销单,金额列' : '') + '\r\n' + state.transactions.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(r){var values=[r.date,r.type==='expense'?'支出':'收入',category(r.category).name,(r.amount/100).toFixed(2),r.note];if(accountName)values.unshift(accountName);if(isPublic){var kind=reportClass(r);values.push(r.spec||'',r.type==='expense'?kind.groupName:'',r.type==='expense'?kind.columnName:'');}return values.map(cell).join(',');}).join('\r\n');
   }
-  return { KEY:KEY,accountNames:accountNames,reportClass:reportClass,reportGroupNames:reportGroupNames,reportColumnNames:reportColumnNames,emptyWorkspace:emptyWorkspace,normalizeWorkspace:normalizeWorkspace,categories:categories,today:today,money:money,parseAmount:parseAmount,validDate:validDate,category:category,empty:empty,normalize:normalize,saveEntry:saveEntry,summary:summary,shiftMonth:shiftMonth,csv:csv };
+  return { KEY:KEY,accountNames:accountNames,reportClass:reportClass,reportStatistics:reportStatistics,reportGroupNames:reportGroupNames,reportColumnNames:reportColumnNames,emptyWorkspace:emptyWorkspace,normalizeWorkspace:normalizeWorkspace,categories:categories,today:today,money:money,parseAmount:parseAmount,validDate:validDate,category:category,empty:empty,normalize:normalize,saveEntry:saveEntry,summary:summary,shiftMonth:shiftMonth,csv:csv };
 });
